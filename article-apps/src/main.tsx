@@ -1,11 +1,14 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 
-import "./index.css";
-import { NewsListPage } from "./presentation/pages/NewsListPage.tsx";
+import "./assets/styles/index.css";
+import Pages from "./presentation/routes/index.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <NewsListPage />
+    <BrowserRouter>
+      <Pages />
+    </BrowserRouter>
   </StrictMode>
 );

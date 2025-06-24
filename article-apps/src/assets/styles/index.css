@@ -1,0 +1,44 @@
+@import "../fonts/index.css";
+
+:root,
+#root {
+  font-family: var(--font-barlow-condensed);
+  color: rgba(255, 255, 255, 0.87);
+  background-color: var(--bg-primary-cray);
+
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img,
+picture {
+  max-width: 100%;
+  display: block;
+}
