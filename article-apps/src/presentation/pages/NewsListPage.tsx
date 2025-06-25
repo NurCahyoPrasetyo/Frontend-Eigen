@@ -1,86 +1,92 @@
-import { Breadcrumb, Card, Layout, Menu, theme } from "antd";
-import { useEffect, useState } from "react";
+import { Alert, Empty, Pagination, Typography } from "antd";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { FetchPopularNews } from "../../application/usecases/fetchPopularNews";
-import reactLogo from "../../assets/react.svg";
+import env from "../../config/env";
 import type { Article } from "../../domain/entities/Article";
 import { NewsApiRepository } from "../../infrastructure/api/NewsApiRepository";
+import LoadingSpiner from "../components/atoms/LoadingSpiner";
+import ArticleGrid from "../components/molecules/ArticleGrid";
+import ArticleSearch from "../components/molecules/ArticleSearch";
 
-const { Meta } = Card;
-const { Header, Content, Footer } = Layout;
+const { Title } = Typography;
+const apiUrl = env.apiUrl;
+const apiKey = env.apiKey;
+const pageSize = 20; // Default page size
 
-const items = Array.from({ length: 15 }).map((_, index) => ({
-  key: index + 1,
-  label: `nav ${index + 1}`,
-}));
+const NewsListPage: React.FC = () => {
+  const navigate = useNavigate();
 
-export const NewsListPage = () => {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [search, setSearch] = useState<string>("apple");
 
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
+  const getListArticle = useCallback(async () => {
+    setLoading(true);
+    const repo = new NewsApiRepository(apiUrl, apiKey, page, search);
+    const usecase = new FetchPopularNews(repo);
+
+    usecase
+      .execute()
+      .then((data) => {
+        setArticles(data.articles);
+        setLoading(false);
+        setTotalPages(Math.ceil(data.totalResults / pageSize));
+      })
+      .catch((error) => {
+        setLoading(false);
+        setError("Limit Hit APIs Data");
+        console.log("err", error);
+      });
+  }, [page, search]);
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL;
-    const apiKey = import.meta.env.VITE_API_KEY;
+    setLoading(true);
+    setArticles([]);
 
-    if (apiUrl && apiKey) {
-      const repo = new NewsApiRepository(apiUrl, apiKey);
-      const usecase = new FetchPopularNews(repo);
+    if (apiUrl && apiKey) getListArticle();
+  }, [getListArticle]);
 
-      usecase.execute().then(setArticles).catch(console.error);
-    }
-  }, []);
+  const handleNavigate = (article: Article, id: string | number) => {
+    localStorage.setItem("articleDetail", JSON.stringify(article));
+    navigate(`/detail/${id}`);
+  };
 
   return (
-    <Layout>
-      <Header style={{ display: "flex", alignItems: "center" }}>
-        <div className="demo-logo" />
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          defaultSelectedKeys={["2"]}
-          items={items}
-          style={{ flex: 1, minWidth: 0 }}
-        />
-      </Header>
-      <Content style={{ padding: "0 48px" }}>
-        <Breadcrumb
-          style={{ margin: "16px 0" }}
-          items={[{ title: "Home" }, { title: "List" }, { title: "App" }]}
-        />
-        <div
-          style={{
-            background: colorBgContainer,
-            minHeight: 280,
-            padding: 24,
-            borderRadius: borderRadiusLG,
+    <>
+      {error && (
+        <Alert
+          message={error}
+          type="error"
+          closable
+          onClose={() => {
+            setPage(1);
+            setError(undefined);
           }}
-        >
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
-            {articles.map((article, index) => (
-              <Card
-                key={index}
-                hoverable
-                style={{ width: 240 }}
-                cover={
-                  <img
-                    alt={article.title}
-                    src={article.urlToImage || reactLogo}
-                    style={{ height: 160, objectFit: "cover" }}
-                  />
-                }
-              >
-                <Meta title={article.title} description={article.url} />
-              </Card>
-            ))}
-          </div>
-        </div>
-      </Content>
-      <Footer style={{ textAlign: "center" }}>
-        Ant Design ©{new Date().getFullYear()} Created by Ant UED
-      </Footer>
-    </Layout>
+        />
+      )}
+
+      <Title>LIST ARTICLE {search.toUpperCase()}</Title>
+      <ArticleSearch loading={loading} onSearch={setSearch} />
+      <LoadingSpiner isShow={loading} />
+      <ArticleGrid articles={articles} onArticleClick={handleNavigate} />
+
+      {!loading && articles.length === 0 && <Empty />}
+      {!loading && articles.length > 0 && (
+        <Pagination
+          align="end"
+          responsive={true}
+          defaultCurrent={page}
+          total={totalPages}
+          onChange={(page) => setPage(page)}
+        />
+      )}
+    </>
   );
 };
+
+export default NewsListPage;
