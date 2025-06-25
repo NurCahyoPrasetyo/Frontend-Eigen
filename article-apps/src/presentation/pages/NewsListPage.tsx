@@ -1,14 +1,4 @@
-import {
-  Alert,
-  Card,
-  Col,
-  Empty,
-  Input,
-  Pagination,
-  Popover,
-  Row,
-  Typography,
-} from "antd";
+import { Alert, Empty, Pagination, Typography } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,8 +6,9 @@ import { FetchPopularNews } from "../../application/usecases/fetchPopularNews";
 import type { Article } from "../../domain/entities/Article";
 import { NewsApiRepository } from "../../infrastructure/api/NewsApiRepository";
 import LoadingSpiner from "../components/atoms/LoadingSpiner";
+import ArticleGrid from "../components/molecules/ArticleGrid";
+import ArticleSearch from "../components/molecules/ArticleSearch";
 
-const { Meta } = Card;
 const { Title } = Typography;
 const apiUrl = import.meta.env.VITE_API_URL;
 const apiKey = import.meta.env.VITE_API_KEY;
@@ -59,6 +50,11 @@ const NewsListPage: React.FC = () => {
     if (apiUrl && apiKey) getListArticle();
   }, [getListArticle]);
 
+  const handleNavigate = (article: Article, id: string | number) => {
+    localStorage.setItem("articleDetail", JSON.stringify(article));
+    navigate(`/detail/${id}`);
+  };
+
   return (
     <>
       {error && (
@@ -74,44 +70,9 @@ const NewsListPage: React.FC = () => {
       )}
 
       <Title>LIST ARTICLE {search.toUpperCase()}</Title>
-      <Input.Search
-        placeholder="Filled"
-        variant="filled"
-        onSearch={(value) => setSearch(value)}
-        loading={loading}
-      />
+      <ArticleSearch loading={loading} onSearch={setSearch} />
       <LoadingSpiner isShow={loading} />
-
-      <Row gutter={[16, 16]} justify="center" style={{ padding: "20px" }}>
-        {articles.map((article, index) => (
-          <Col key={index} span={8}>
-            <Popover content="CLICK FOR SHOW DETAIL">
-              <Card
-                onClick={() => {
-                  localStorage.setItem(
-                    "articleDetail",
-                    JSON.stringify(article)
-                  );
-                  navigate(`/detail/${article.source.id || index}`);
-                }}
-                hoverable
-                cover={
-                  <img
-                    alt={article.title}
-                    src={
-                      article.urlToImage ||
-                      "https://placehold.co/600x400?text=No+Image"
-                    }
-                    style={{ height: 160, objectFit: "cover" }}
-                  />
-                }
-              >
-                <Meta title={article.title} description={article.content} />
-              </Card>
-            </Popover>
-          </Col>
-        ))}
-      </Row>
+      <ArticleGrid articles={articles} onArticleClick={handleNavigate} />
 
       {!loading && articles.length === 0 && <Empty />}
       {!loading && articles.length > 0 && (
