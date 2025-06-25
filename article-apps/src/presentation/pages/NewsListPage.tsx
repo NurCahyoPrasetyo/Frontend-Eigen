@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { FetchPopularNews } from "../../application/usecases/fetchPopularNews";
+import env from "../../config/env";
 import type { Article } from "../../domain/entities/Article";
 import { NewsApiRepository } from "../../infrastructure/api/NewsApiRepository";
 import LoadingSpiner from "../components/atoms/LoadingSpiner";
@@ -10,8 +11,8 @@ import ArticleGrid from "../components/molecules/ArticleGrid";
 import ArticleSearch from "../components/molecules/ArticleSearch";
 
 const { Title } = Typography;
-const apiUrl = import.meta.env.VITE_API_URL;
-const apiKey = import.meta.env.VITE_API_KEY;
+const apiUrl = env.apiUrl;
+const apiKey = env.apiKey;
 const pageSize = 20; // Default page size
 
 const NewsListPage: React.FC = () => {
