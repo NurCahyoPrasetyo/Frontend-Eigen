@@ -5,7 +5,7 @@ const LoadingSpiner: React.FC<{ isShow: boolean }> = ({ isShow }) => {
 
   return (
     <div className="loading-contnets">
-      <div className="spinner" />
+      <div className="spinner" data-testid="spinner" />
     </div>
   );
 };
