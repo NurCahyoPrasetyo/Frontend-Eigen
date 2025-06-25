@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { FetchPopularNews } from "../../application/usecases/fetchPopularNews";
 import type { Article } from "../../domain/entities/Article";
 import { NewsApiRepository } from "../../infrastructure/api/NewsApiRepository";
+import LoadingSpiner from "../components/atoms/LoadingSpiner";
 
 const { Meta } = Card;
 const { Title } = Typography;
@@ -71,25 +72,23 @@ const NewsListPage: React.FC = () => {
         />
       )}
 
-      <Title>LIST ARTICLE APPEL</Title>
+      <Title>LIST ARTICLE {search.toUpperCase()}</Title>
       <Input.Search
         placeholder="Filled"
         variant="filled"
         onSearch={(value) => setSearch(value)}
         loading={loading}
       />
-
-      {loading && (
-        <div className="loading-contnets">
-          <div className="spinner" />
-        </div>
-      )}
+      <LoadingSpiner isShow={loading} />
 
       <Row gutter={[16, 16]} justify="center" style={{ padding: "20px" }}>
         {articles.map((article, index) => (
           <Col key={index} span={8}>
             <Card
-              onClick={() => navigate(`/detail/${article.source.id || index}`)}
+              onClick={() => {
+                localStorage.setItem("articleDetail", JSON.stringify(article));
+                navigate(`/detail/${article.source.id || index}`);
+              }}
               hoverable
               cover={
                 <img
