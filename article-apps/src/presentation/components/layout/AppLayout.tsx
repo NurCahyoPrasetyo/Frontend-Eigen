@@ -1,4 +1,4 @@
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { Layout, Menu, theme } from "antd";
 import React from "react";
 import { Outlet } from "react-router-dom";
 
@@ -24,15 +24,11 @@ const AppLayout: React.FC = () => {
         />
       </Header>
 
-      <Content style={{ padding: "0 48px" }}>
-        <Breadcrumb
-          style={{ margin: "16px 0" }}
-          items={[{ title: "Home" }, { title: "List" }, { title: "App" }]}
-        />
+      <Content style={{ padding: "18px 48px" }}>
         <div
           style={{
             background: colorBgContainer,
-            minHeight: 280,
+            minHeight: "80vh",
             padding: 24,
             borderRadius: borderRadiusLG,
           }}

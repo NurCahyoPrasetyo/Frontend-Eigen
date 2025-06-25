@@ -1,5 +1,5 @@
-import type { Article } from "../entities/Article";
+import type { NewsApiResponse } from "../entities/Article";
 
 export interface NewsRepository {
-  fetchPopularNews(): Promise<Article[]>;
+  fetchPopularNews(): Promise<NewsApiResponse>;
 }

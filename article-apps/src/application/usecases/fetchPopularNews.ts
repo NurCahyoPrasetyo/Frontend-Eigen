@@ -1,4 +1,4 @@
-import type { Article } from "../../domain/entities/Article";
+import type { NewsApiResponse } from "../../domain/entities/Article";
 import type { NewsRepository } from "../../domain/repositories/NewsRepository";
 
 export class FetchPopularNews {
@@ -8,7 +8,7 @@ export class FetchPopularNews {
     this.repo = repo;
   }
 
-  async execute(): Promise<Article[]> {
+  async execute(): Promise<NewsApiResponse> {
     return await this.repo.fetchPopularNews();
   }
 }
