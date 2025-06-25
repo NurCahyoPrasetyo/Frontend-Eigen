@@ -15,7 +15,6 @@ jest.mock("react-router-dom", () => {
 
 describe("DetailPage", () => {
   beforeEach(() => {
-    // Mock data di localStorage
     const mockArticle = {
       title: "Test Title",
       content: "Test Content",
